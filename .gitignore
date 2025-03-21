@@ -1,1 +1,44 @@
-./node_modules/*
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# Dotenv (pliki konfiguracyjne z danymi wrażliwymi)
+.env
+.env.local
+.env.*.local
+
+# Systemowe
+.DS_Store
+Thumbs.db
+
+# IDE/Editor
+.vscode/
+.idea/
+*.iml
+
+# Build / Output
+dist/
+build/
+
+# Logs
+logs
+*.log
+logs/
+*.out
+*.pid
+*.seed
+*.csv
+*.sqlite
+
+# Jest / Testing
+coverage/
+*.lcov
+
+# Dependencies
+node_modules/
+
+# Misc
+*.bak
+*.swp
