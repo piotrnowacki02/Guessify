@@ -41,4 +41,8 @@ router.get('/', (req, res) => {
     res.send('Hello World!');
 });
 
+router.get('/marco', (req, res) => {
+    res.send('Kochamy Marco!');
+});
+
 module.exports = router;
