@@ -18,27 +18,6 @@ Thumbs.db
 .idea/
 *.iml
 
-# Build / Output
-dist/
-build/
-
-# Logs
-logs
-*.log
-logs/
-*.out
-*.pid
-*.seed
-*.csv
-*.sqlite
-
-# Jest / Testing
-coverage/
-*.lcov
-
 # Dependencies
 node_modules/
 
-# Misc
-*.bak
-*.swp
