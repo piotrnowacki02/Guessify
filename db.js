@@ -1,5 +1,5 @@
 const sqlite3 = require('sqlite3').verbose();
-
+//komentarz
 const db = new sqlite3.Database('./users.db');
 
 // Tworzenie tabeli 'users' (jeśli nie istnieje)
