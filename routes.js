@@ -41,15 +41,18 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
+        console.log("logowanie bez emaila lub hasła");
         return res.status(400).json({ error: "Email i hasło są wymagane!" });
     }
 
     db.findUserByEmail(email, async (err, user) => {
         if (err) {
+            console.log("błąd bazy danych");
             return res.status(500).json({ error: "Błąd bazy danych." });
         }
 
         if (!user) {
+            console.log("użytkownik nie istnieje");
             return res.status(400).json({ error: "Użytkownik nie istnieje." });
         }
 
@@ -57,9 +60,10 @@ router.post('/login', async (req, res) => {
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
+            console.log("nieprawidłowe hasło");
             return res.status(400).json({ error: "Nieprawidłowe hasło." });
         }
-
+        console.log("zalogowano pomyślnie");
         res.status(200).json({ message: "Zalogowano pomyślnie." });
     });
 });
