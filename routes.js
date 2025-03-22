@@ -1,6 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const { findUserByEmail, addUser } = require('./db');
+const db = require('./db');
 
 const router = express.Router();
 
@@ -14,7 +14,7 @@ router.post('/register', async (req, res) => {
     }
 
     // Sprawdzenie, czy e-mail już istnieje w bazie
-    findUserByEmail(email, async (err, user) => {
+    db.findUserByEmail(email, async (err, user) => {
         if (err) {
             return res.status(500).json({ error: "Błąd bazy danych." });
         }
@@ -27,13 +27,40 @@ router.post('/register', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Dodanie użytkownika do bazy
-        addUser(email, hashedPassword, (err) => {
+        db.addUser(email, hashedPassword, (err) => {
             if (err) {
                 return res.status(500).json({ error: "Nie udało się zarejestrować użytkownika." });
             }
             res.status(200); // Przekierowanie na stronę logowania
             console.log("Użytkownik został zarejestrowany.");
         });
+    });
+});
+
+router.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({ error: "Email i hasło są wymagane!" });
+    }
+
+    db.findUserByEmail(email, async (err, user) => {
+        if (err) {
+            return res.status(500).json({ error: "Błąd bazy danych." });
+        }
+
+        if (!user) {
+            return res.status(400).json({ error: "Użytkownik nie istnieje." });
+        }
+
+        // Porównanie hasła
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if (!isPasswordValid) {
+            return res.status(400).json({ error: "Nieprawidłowe hasło." });
+        }
+
+        res.status(200).json({ message: "Zalogowano pomyślnie." });
     });
 });
 
