@@ -31,7 +31,7 @@ router.post('/register', async (req, res) => {
             if (err) {
                 return res.status(500).json({ error: "Nie udało się zarejestrować użytkownika." });
             }
-            res.status(200); // Przekierowanie na stronę logowania
+            res.status(200).json({ message: "Użytkownik został zarejestrowany." });; // Przekierowanie na stronę logowania
             console.log("Użytkownik został zarejestrowany.");
         });
     });
@@ -63,6 +63,19 @@ router.post('/login', async (req, res) => {
         res.status(200).json({ message: "Zalogowano pomyślnie." });
     });
 });
+
+router.post('/create-room', async (req, res) => {
+
+
+    // Dodanie pokoju do bazy
+    db.addRoom(name, (err) => {
+        if (err) {
+            return res.status(500).json({ error: "Nie udało się utworzyć pokoju." });
+        }
+        res.status(200).json({ message: "Pokój został utworzony." });
+    });
+});
+
 
 router.get('/', (req, res) => {
     res.send('Hello World!');
