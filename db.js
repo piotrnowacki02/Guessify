@@ -78,7 +78,7 @@ const updateRoomPlaylist = (id_playlist, id_room, songs, callback) => {
 
 
 module.exports = { 
-    indUserByEmail,
+    findUserByEmail,
     addUser,
     addRoom,
     updateRoomPlaylist
