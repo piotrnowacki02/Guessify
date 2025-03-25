@@ -1,5 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const db = require('./db');
 
 const router = express.Router();
@@ -63,14 +64,21 @@ router.post('/login', async (req, res) => {
             console.log("nieprawidłowe hasło");
             return res.status(400).json({ error: "Nieprawidłowe hasło." });
         }
+
+        const token = jwt.sign(
+            { id: user.id },
+            process.env.JWT_SECRET,
+            { expiresIn: '24h' }
+        );
+
         console.log("zalogowano pomyślnie");
-        res.status(200).json({ message: "Zalogowano pomyślnie." });
+        res.status(200).json({ message: "Zalogowano pomyślnie.", token });
     });
 });
 
 router.post('/create-room', async (req, res) => {
 
-
+    const playlist = req.body.playlist;
     // Dodanie pokoju do bazy
     db.addRoom(name, (err) => {
         if (err) {
