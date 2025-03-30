@@ -98,7 +98,7 @@ router.get('/', (req, res) => {
 });
 
 router.get('/marco', (req, res) => {
-    res.send('Kochamy Marco!');
+    // res.send('Kochamy Marco!');
     db.getAllData((err, data) => {
         if (err) {
             console.error("Błąd pobierania danych z bazy:", err);
