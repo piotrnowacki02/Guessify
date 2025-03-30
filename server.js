@@ -1,9 +1,11 @@
 const express = require('express');
 const routes = require("./routes");
+const { authenticateToken } = require("./middleware");
 const cors = require('cors');
 require('dotenv').config(); 
 const app = express();
 const PORT = 3000;
+
 
 app.use(cors());
 // app.use(cors({
@@ -14,7 +16,9 @@ app.use(cors());
 
 // Middleware do obsługi JSON
 app.use(express.json());
+app.use(authenticateToken);
 app.use("/", routes);
+
 
 
 // Uruchomienie serwera

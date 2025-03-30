@@ -6,7 +6,7 @@ function authenticateToken(req, res, next) {
 
     if (!token) return res.status(401).json({ error: "Brak tokena" });
 
-    jwt.verify(token, "sekretny-klucz", (err, user) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
         if (err) return res.status(403).json({ error: "Nieprawidłowy token" });
 
         req.user = user;
