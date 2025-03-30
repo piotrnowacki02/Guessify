@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('./db');
+const authenticateToken = require("./middlewares/authenticateToken");
 
 const router = express.Router();
 
@@ -76,10 +77,11 @@ router.post('/login', async (req, res) => {
     });
 });
 
-router.post('/create-room', async (req, res) => {
+router.post('/create-room',authenticateToken, async (req, res) => {
 
     const playlist = req.body.playlist;
-    // Dodanie pokoju do bazy
+    const user = req.user;
+    
     db.addRoom(name, (err) => {
         if (err) {
             return res.status(500).json({ error: "Nie udało się utworzyć pokoju." });
