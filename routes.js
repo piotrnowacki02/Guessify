@@ -99,6 +99,13 @@ router.get('/', (req, res) => {
 
 router.get('/marco', (req, res) => {
     res.send('Kochamy Marco!');
+    db.getAllData((err, data) => {
+        if (err) {
+            console.error("Błąd pobierania danych z bazy:", err);
+            return res.status(500).json({ error: "Nie udało się pobrać danych z bazy." });
+        }
+        res.status(200).json(data);
+    });
 });
 
 module.exports = router;

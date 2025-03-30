@@ -74,12 +74,27 @@ const updateRoomPlaylist = (id_playlist, id_room, songs, callback) => {
         }
     );
 };
-
+const getAllData = (callback) => {
+    db.all(`
+        SELECT 
+            users.id AS user_id, 
+            users.email, 
+            rooms.id AS room_id, 
+            rooms.id_owner, 
+            rooms.round, 
+            rooms.id_playlist, 
+            rooms.status
+        FROM users
+        LEFT JOIN rooms ON users.id = rooms.id_owner
+    `, [], callback);
+};
 
 
 module.exports = { 
     findUserByEmail,
     addUser,
     addRoom,
-    updateRoomPlaylist
+    updateRoomPlaylist,
+    getAllData
+
 };
