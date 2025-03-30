@@ -78,7 +78,7 @@ router.post('/login', async (req, res) => {
 
 router.post("/create-room", (req, res) => {
     const id_owner = req.user.id;
-    const { id_playlist } = req.body;
+    const id_playlist = req.body.playlist;
 
     if (!id_playlist) {
         return res.status(400).json({ error: "Brak id_playlist" });
