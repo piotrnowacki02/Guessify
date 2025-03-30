@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('./db');
-const authenticateToken = require("./middlewares/authenticateToken");
+const authenticateToken = require("./middleware/authenticateToken");
 
 const router = express.Router();
 
@@ -77,19 +77,22 @@ router.post('/login', async (req, res) => {
     });
 });
 
-router.post('/create-room',authenticateToken, async (req, res) => {
+router.post("/create-room", authenticateToken, (req, res) => {
+    const id_owner = req.user.id;
+    const { id_playlist } = req.body;
 
-    const playlist = req.body.playlist;
-    const user = req.user;
-    
-    db.addRoom(name, (err) => {
+    if (!id_playlist) {
+        return res.status(400).json({ error: "Brak id_playlist" });
+    }
+
+    db.addRoom(id_owner, id_playlist, (err) => {
         if (err) {
+            console.error("Błąd dodawania pokoju:", err);
             return res.status(500).json({ error: "Nie udało się utworzyć pokoju." });
         }
-        res.status(200).json({ message: "Pokój został utworzony." });
+        res.status(201).json({ message: "Pokój został utworzony." });
     });
 });
-
 
 router.get('/', (req, res) => {
     res.send('Hello World!');
