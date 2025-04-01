@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('./db');
+const spotify = require('./spotify');
 
 const router = express.Router();
 
@@ -82,6 +83,11 @@ router.post("/create-room", (req, res) => {
 
     if (!id_playlist) {
         return res.status(400).json({ error: "Brak id_playlist" });
+    }
+
+    id_playlist = spotify.fetchPlaylistData(id_playlist)
+    if(!id_playlist) {
+        return res.status(400).json({ error: "Nie udało się pobrać danych z playlisty." });
     }
 
     db.addRoom(id_owner, id_playlist, (err) => {

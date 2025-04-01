@@ -37,7 +37,7 @@ const fetchPlaylistData = async (playlistUrl) => {
     
     if (await db.isPlaylistInDB(playlistId)) {
         console.log("Playlist already in DB");
-        return;
+        return playlistId;
     }
     else {
         console.log("Playlist not in DB, proceeding...");
@@ -77,14 +77,7 @@ const fetchPlaylistData = async (playlistUrl) => {
         nextUrl = trackResponse.data.next;
     }
 
-
-    //console.log("Uczestnicy playlisty:", Array.from(addedByUsers));
-    // return {
-    //     name: playlistResponse.data.name,
-    //     owner: playlistResponse.data.owner.display_name,
-    //     description: playlistResponse.data.description,
-    //     tracks
-    // };
+    return playlistId;
 };
 
 const fetchUserNameById = async (userId) => {
@@ -137,3 +130,9 @@ fetchPlaylistData(playlistUrl)
 //     .then(participants => console.log('Uczestnicy playlisty:', participants))
 //     .catch(error => console.error('Error:', error.message));
 
+module.exports = {
+    fetchPlaylistData,
+    fetchPlaylistParticipants,
+    extractPlaylistId,
+    getToken
+};
