@@ -26,6 +26,7 @@ const extractPlaylistId = (url) => {
 
 const fetchPlaylistData = async (playlistUrl) => {
     const token = await getToken();
+    console.log(token);
     const playlistId = extractPlaylistId(playlistUrl);
     if (!playlistId) throw new Error('Invalid playlist URL');
 
@@ -40,8 +41,15 @@ const fetchPlaylistData = async (playlistUrl) => {
         const trackResponse = await axios.get(nextUrl, {
             headers: { Authorization: `Bearer ${token}` }
         });
-        
+        let round = 0;
         trackResponse.data.items.forEach(track => {
+            round++;
+            adding_user_name = fetchUserNameById(track.added_by.id);
+            db.addSong(playlistId, round, track.track.name, adding_user_name, (err) => {
+                if (err) {
+                    console.error("Błąd dodawania utworu:", err);
+                }
+            });
             tracks.push({
                 name: track.track.name,
                 artists: track.track.artists.map(artist => artist.name).join(', '),
@@ -60,6 +68,14 @@ const fetchPlaylistData = async (playlistUrl) => {
         tracks
     };
 };
+
+const fetchUserNameById = async (userId) => {
+    const token = await getToken();
+    const userResponse = await axios.get(`https://api.spotify.com/v1/users/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+    return userResponse.data.display_name;
+}
 
 const fetchPlaylistParticipants = async (playlistUrl) => {
     const token = await getToken();

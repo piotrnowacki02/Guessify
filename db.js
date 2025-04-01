@@ -74,6 +74,14 @@ const updateRoomPlaylist = (id_playlist, id_room, songs, callback) => {
         }
     );
 };
+
+const addSong = (id_playlist, round, song, added_by, callback) => {
+    db.run(`INSERT INTO songs (id_playlist, round, song, added_by) VALUES (?, ?, ?, ?)`, 
+        [id_playlist, round, song, added_by],
+        callback
+    );
+}
+
 const getAllData = (callback) => {
     db.all(`
         SELECT 
