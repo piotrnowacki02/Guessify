@@ -1,6 +1,11 @@
 const sqlite3 = require('sqlite3').verbose();
-//komentarz
+
+const { promisify } = require('util');
+
 const db = new sqlite3.Database('./users.db');
+
+// Konwersja metod na wersję Promise
+db.allAsync = promisify(db.all).bind(db);
 
 // Tworzenie tabeli 'users' (jeśli nie istnieje)
 db.run(`
@@ -82,6 +87,16 @@ const addSong = (id_playlist, round, song, added_by, callback) => {
     );
 }
 
+async function isPlaylistInDB(playlistId) {
+    try {
+        const rows = await db.allAsync(`SELECT * FROM songs WHERE id_playlist = ?`, [playlistId]);
+        return rows.length > 0;
+    } catch (error) {
+        console.error("Database error:", error);
+        return false;
+    }
+}
+
 const getAllData = (callback) => {
     db.all(`
         SELECT 
@@ -103,6 +118,7 @@ module.exports = {
     addUser,
     addRoom,
     updateRoomPlaylist,
-    getAllData
-
+    getAllData,
+    addSong,
+    isPlaylistInDB
 };
