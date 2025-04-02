@@ -89,7 +89,7 @@ router.post("/create-room", (req, res) => {
     if(!id_playlist) {
         return res.status(400).json({ error: "Nie udało się pobrać danych z playlisty." });
     }
-
+    console.log(id_playlist);
     db.addRoom(id_owner, id_playlist, (err) => {
         if (err) {
             console.error("Błąd dodawania pokoju:", err);
