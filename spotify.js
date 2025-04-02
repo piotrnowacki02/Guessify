@@ -2,7 +2,6 @@ const axios = require('axios');
 const qs = require('querystring');
 require('dotenv').config();
 const db = require('./db');
-const { use } = require('./routes');
 
 const clientId = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
