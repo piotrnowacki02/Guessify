@@ -40,6 +40,20 @@ db.run(`
     )
 `);
 
+db.run(`
+    CREATE TABLE IF NOT EXISTS user_room_data (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id_room INTEGER NOT NULL,
+        id_user INTEGER NULL,
+        user_spotify_name TEXT NOT NULL,
+        user_room_name TEXT NULL,
+        points INTEGER DEFAULT 0,
+        FOREIGN KEY (id_room) REFERENCES rooms(id),
+        FOREIGN KEY (id_user) REFERENCES users(id),
+        FOREIGN KEY (user_spotify_name) REFERENCES songs(added_by)
+    )
+`);
+
 // Funkcja sprawdzająca, czy użytkownik istnieje
 const findUserByEmail = (email, callback) => {
     db.get(`SELECT * FROM users WHERE email = ?`, [email], callback);
@@ -54,9 +68,41 @@ const addUser = (email, hashedPassword, callback) => {
 };
 
 const addRoom = (id_owner, id_playlist, callback) => {
-    db.run(`INSERT INTO rooms (id_owner, id_playlist) VALUES (?, ?)`, 
+    db.run(
+        `INSERT INTO rooms (id_owner, id_playlist) VALUES (?, ?)`, 
         [id_owner, id_playlist],
-        callback
+        function (err) {
+            if (err) {
+                return callback(err);
+            }
+            const roomId = this.lastID;
+
+            // Query the 'songs' table for distinct 'added_by' values
+            db.all(
+                `SELECT DISTINCT added_by FROM songs WHERE id_playlist = ?`, 
+                [id_playlist],
+                (err, rows) => {
+                    if (err) {
+                        return callback(err);
+                    }
+
+                    // Insert data into user_room_data for each distinct 'added_by'
+                    const stmt = db.prepare(
+                        `INSERT INTO user_room_data (id_room, user_spotify_name) VALUES (?, ?)`
+                    );
+                    for (const row of rows) {
+                        stmt.run([roomId, row.added_by]);
+                    }
+                    stmt.finalize((err) => {
+                        if (err) {
+                            return callback(err);
+                        }
+                        // Return the id of the newly created room and the distinct 'added_by' values
+                        callback(null, roomId);
+                    });
+                }
+            );
+        }
     );
 };
 
@@ -95,6 +141,12 @@ async function isPlaylistInDB(playlistId) {
         console.error("Database error:", error);
         return false;
     }
+}
+
+function getRoomUsersNames(roomId, callback) {
+    db.all(`SELECT users.email FROM users 
+            JOIN rooms ON users.id = rooms.id_owner 
+            WHERE rooms.id = ?`, [roomId], callback);
 }
 
 const getAllData = (callback) => {

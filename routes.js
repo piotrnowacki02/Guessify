@@ -80,23 +80,39 @@ router.post('/login', async (req, res) => {
 router.post("/create-room", (req, res) => {
     const id_owner = req.user.id;
     let id_playlist = req.body.playlist;
-    
+
     if (!id_playlist) {
         return res.status(400).json({ error: "Brak id_playlist" });
     }
 
-    spotify.fetchPlaylistData(id_playlist)
+    spotify.fetchPlaylistData(id_playlist);
     id_playlist = spotify.extractPlaylistId(id_playlist);
-    if(!id_playlist) {
+    if (!id_playlist) {
         return res.status(400).json({ error: "Nie udało się pobrać danych z playlisty." });
     }
     console.log(id_playlist);
-    db.addRoom(id_owner, id_playlist, (err) => {
+    db.addRoom(id_owner, id_playlist, (err, roomId) => {
         if (err) {
             console.error("Błąd dodawania pokoju:", err);
             return res.status(500).json({ error: "Nie udało się utworzyć pokoju." });
         }
-        res.status(201).json({ message: "Pokój został utworzony." });
+        res.status(201).json({ message: "Pokój został utworzony.", roomId });
+    });
+});
+
+router.post("/get-room-players", (req, res) => {
+    const id_room = req.body.id_room;
+
+    if (!id_room) {
+        return res.status(400).json({ error: "Brak id_pokoju" });
+    }
+
+    db.getRoomPlayers(id_room, (err, players) => {
+        if (err) {
+            console.error("Błąd pobierania graczy z pokoju:", err);
+            return res.status(500).json({ error: "Nie udało się pobrać graczy z pokoju." });
+        }
+        res.status(200).json(players);
     });
 });
 
