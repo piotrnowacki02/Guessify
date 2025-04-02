@@ -30,8 +30,8 @@ const fetchPlaylistData = async (playlistUrl) => {
     console.log(token);
 
     const playlistId = extractPlaylistId(playlistUrl);
-    
-    if (!playlistId) throw new Error('Invalid playlist URL');
+    console.log(playlistId);
+    if (!playlistId) console.log("Nie udało się znaleźć id playlisty");
 
     
     if (await db.isPlaylistInDB(playlistId)) {
