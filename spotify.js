@@ -119,16 +119,6 @@ const fetchPlaylistParticipants = async (playlistUrl) => {
 
 
 
-// Przykładowe użycie
-const playlistUrl = 'https://open.spotify.com/playlist/2qLXVvQivgEtbFlBxeBnnL?si=06220c9396b24f88';
-fetchPlaylistData(playlistUrl)
-    .then(data => console.log("data"))
-    .catch(error => console.error('Error:', error.message));
-
-// fetchPlaylistParticipants(playlistUrl)
-//     .then(participants => console.log('Uczestnicy playlisty:', participants))
-//     .catch(error => console.error('Error:', error.message));
-
 module.exports = {
     fetchPlaylistData,
     fetchPlaylistParticipants,
