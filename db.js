@@ -153,6 +153,13 @@ function getRoomUsersNames(roomId, callback) {
     });
 }
 
+function updateUserRoomName(user_room_name, id_user, user_spotify_name, id_room, callback) {
+    db.run(`UPDATE user_room_data SET user_room_name = ?, id_user = ?  WHERE user_spotify_name = ? AND id_room = ?`, 
+        [user_room_name, id_user, user_spotify_name, id_room],
+        callback
+    );
+}
+
 const getAllData = (callback) => {
     db.all(`
         SELECT 

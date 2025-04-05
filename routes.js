@@ -102,16 +102,18 @@ router.post("/create-room", (req, res) => {
 
 router.post("/get-room-players", (req, res) => {
     const id_room = req.body.id_room;
-
+    console.log("/get-room-players", id_room);
     if (!id_room) {
+        console.log("Brak id_pokoju");
         return res.status(400).json({ error: "Brak id_pokoju" });
     }
 
-    db.getRoomPlayers(id_room, (err, players) => {
+    db.getRoomUserNames(id_room, (err, players) => {
         if (err) {
             console.error("Błąd pobierania graczy z pokoju:", err);
             return res.status(500).json({ error: "Nie udało się pobrać graczy z pokoju." });
         }
+        console.log("Poprawnie pobrano");
         res.status(200).json(players);
     });
 });
