@@ -102,9 +102,7 @@ router.post("/create-room", (req, res) => {
 
 router.post("/get-room-players", (req, res) => {
     const id_room = req.body.id_room;
-    console.log("/get-room-players", id_room);
     if (!id_room) {
-        console.log("Brak id_pokoju");
         return res.status(400).json({ error: "Brak id_pokoju" });
     }
 
@@ -113,8 +111,26 @@ router.post("/get-room-players", (req, res) => {
             console.error("Błąd pobierania graczy z pokoju:", err);
             return res.status(500).json({ error: "Nie udało się pobrać graczy z pokoju." });
         }
-        console.log("Poprawnie pobrano");
         res.status(200).json(players);
+    });
+});
+
+router.post("/set-user-room-name", (req, res) => {
+    const id_user = req.user.id;
+    const { id_room, user_room_name, user_spotify_name } = req.body;
+
+    if (!user_room_name || !id_user || !user_spotify_name || !id_room) {
+        console.log("Brak wymaganych danych.");
+        return res.status(400).json({ error: "Brak wymaganych danych." });
+    }
+
+    db.updateUserRoomName(user_room_name, id_user, user_spotify_name, id_room, (err) => {
+        if (err) {
+            console.error("Błąd aktualizacji nazwy użytkownika w pokoju:", err);
+            return res.status(500).json({ error: "Nie udało się zaktualizować nazwy użytkownika w pokoju." });
+        }
+        console.log("Zaktualizowano nazwę użytkownika w pokoju.");
+        res.status(200).json({ message: "Nazwa użytkownika została zaktualizowana." });
     });
 });
 

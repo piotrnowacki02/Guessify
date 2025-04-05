@@ -184,5 +184,6 @@ module.exports = {
     getAllData,
     addSong,
     isPlaylistInDB,
-    getRoomUsersNames
+    getRoomUsersNames,
+    updateUserRoomName
 };
