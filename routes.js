@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('./db');
 const spotify = require('./spotify');
+const path = require('path');
 
 const router = express.Router();
 
@@ -139,14 +140,16 @@ router.get('/', (req, res) => {
 });
 
 router.get('/marco', (req, res) => {
-    // res.send('Kochamy Marco!');
-    db.getAllData((err, data) => {
-        if (err) {
-            console.error("Błąd pobierania danych z bazy:", err);
-            return res.status(500).json({ error: "Nie udało się pobrać danych z bazy." });
-        }
-        res.status(200).json(data);
-    });
+    // // res.send('Kochamy Marco!');
+    // db.getAllData((err, data) => {
+    //     if (err) {
+    //         console.error("Błąd pobierania danych z bazy:", err);
+    //         return res.status(500).json({ error: "Nie udało się pobrać danych z bazy." });
+    //     }
+    //     res.status(200).json(data);
+    // });
+
+    res.sendFile(path.join(__dirname, 'music.mp3'));
 });
 
 module.exports = router;
