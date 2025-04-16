@@ -31,7 +31,7 @@ app.use("/", routes);
 io.on("connection", (socket) => {
     console.log(`Nowe połączenie: ${socket.id}`);
 
-    socket.on("joinRoom", ({ room, username }) => {
+    socket.on("joinRoom", (room) => {
         socket.join(room);
     
         db.getRoomUsersNames(room, (err, users) => {
@@ -43,7 +43,7 @@ io.on("connection", (socket) => {
             io.to(room).emit("roomUsers", users); // Wysyłamy do wszystkich!
         });
     
-        console.log(`🛋️ ${username} (${socket.id}) dołączył do pokoju: ${room}`);
+        console.log(`🛋️(${socket.id}) dołączył do pokoju: ${room}`);
     });
 });
 
