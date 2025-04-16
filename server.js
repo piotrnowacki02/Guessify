@@ -31,16 +31,19 @@ app.use("/", routes);
 io.on("connection", (socket) => {
     console.log(`Nowe połączenie: ${socket.id}`);
 
-    socket.on("joinRoom", (room) => {
+    socket.on("joinRoom", ({ room, username }) => {
         socket.join(room);
+    
         db.getRoomUsersNames(room, (err, users) => {
             if (err) {
                 console.error("Błąd pobierania użytkowników z pokoju:", err);
                 return;
             }
-            socket.to(room).emit("roomUsers", users);
+    
+            io.to(room).emit("roomUsers", users); // Wysyłamy do wszystkich!
         });
-        console.log(`🛋️ Użytkownik ${socket.id} dołączył do pokoju: ${room}`);
+    
+        console.log(`🛋️ ${username} (${socket.id}) dołączył do pokoju: ${room}`);
     });
 });
 

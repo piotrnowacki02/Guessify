@@ -154,14 +154,19 @@ function getRoomUsersSpotifyNames(roomId, callback) {
 }
 
 function getRoomUsersNames(roomId, callback) {
-    db.all(`SELECT user_room_name FROM user_room_data WHERE id_room = ? and user_room_name IS NOT NULL`, [roomId], (err, rows) => {
-        if (err) {
-            return callback(err);
+    db.all(
+        `SELECT user_room_name FROM user_room_data WHERE id_room = ? AND user_room_name IS NOT NULL`,
+        [roomId],
+        (err, rows) => {
+            if (err) {
+                return callback(err);
+            }
+            const names = rows.map(row => row.user_room_name);
+            callback(null, names);
         }
-        const names = rows.map(row => row.user_spotify_name);
-        callback(null, names);
-    });
+    );
 }
+
 
 function updateUserRoomName(user_room_name, id_user, user_spotify_name, id_room, callback) {
     // First, reset id_user and user_room_name to null for existing records with the same id_user in the room
