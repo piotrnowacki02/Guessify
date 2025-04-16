@@ -143,8 +143,18 @@ async function isPlaylistInDB(playlistId) {
     }
 }
 
-function getRoomUsersNames(roomId, callback) {
+function getRoomUsersSpotifyNames(roomId, callback) {
     db.all(`SELECT user_spotify_name FROM user_room_data WHERE id_room = ?`, [roomId], (err, rows) => {
+        if (err) {
+            return callback(err);
+        }
+        const names = rows.map(row => row.user_spotify_name);
+        callback(null, names);
+    });
+}
+
+function getRoomUsersNames(roomId, callback) {
+    db.all(`SELECT user_room_name FROM user_room_data WHERE id_room = ? and user_room_name IS NOT NULL`, [roomId], (err, rows) => {
         if (err) {
             return callback(err);
         }
@@ -210,5 +220,6 @@ module.exports = {
     addSong,
     isPlaylistInDB,
     getRoomUsersNames,
+    getRoomUsersSpotifyNames,
     updateUserRoomName
 };

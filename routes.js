@@ -107,7 +107,7 @@ router.post("/get-room-players", (req, res) => {
         return res.status(400).json({ error: "Brak id_pokoju" });
     }
 
-    db.getRoomUsersNames(id_room, (err, players) => {
+    db.getRoomUsersSpotifyNames(id_room, (err, players) => {
         if (err) {
             console.error("Błąd pobierania graczy z pokoju:", err);
             return res.status(500).json({ error: "Nie udało się pobrać graczy z pokoju." });

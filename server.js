@@ -4,7 +4,8 @@ const routes = require("./routes");
 const authenticateToken = require("./middleware");
 const cors = require('cors');
 const { Server } = require("socket.io");
-require('dotenv').config(); 
+require('dotenv').config();
+const db = require('./db');
 const app = express();
 const PORT = 3000;
 const server = http.createServer(app); // Tworzymy serwer HTTP
@@ -32,6 +33,13 @@ io.on("connection", (socket) => {
 
     socket.on("joinRoom", (room) => {
         socket.join(room);
+        db.getRoomUsersNames(room, (err, users) => {
+            if (err) {
+                console.error("Błąd pobierania użytkowników z pokoju:", err);
+                return;
+            }
+            socket.to(room).emit("roomUsers", users);
+        });
         console.log(`🛋️ Użytkownik ${socket.id} dołączył do pokoju: ${room}`);
     });
 });
