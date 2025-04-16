@@ -39,6 +39,6 @@ io.on("connection", (socket) => {
 
 
 // Uruchomienie serwera
-app.listen(PORT,'0.0.0.0', () => {
+server.listen(PORT,'0.0.0.0', () => {
     console.log(`Serwer działa na http://localhost:${PORT}`);
 });
