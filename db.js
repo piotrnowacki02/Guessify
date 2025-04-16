@@ -162,12 +162,24 @@ function updateUserRoomName(user_room_name, id_user, user_spotify_name, id_room,
             if (err) {
                 return callback(err);
             }
-
-            // Then, update the record with the new user_room_name and id_user
-            db.run(
-                `UPDATE user_room_data SET user_room_name = ?, id_user = ? WHERE user_spotify_name = ? AND id_room = ?`, 
-                [user_room_name, id_user, user_spotify_name, id_room],
-                callback
+            // Check if any record with the given id_room and user_spotify_name has id_user assigned (not null)
+            db.get(
+                `SELECT 1 FROM user_room_data WHERE id_room = ? AND user_spotify_name = ? AND id_user IS NOT NULL`, 
+                [id_room, user_spotify_name],
+                (err, row) => {
+                    if (err) {
+                        return callback(err);
+                    }
+                    if (row) {
+                        return callback(new Error("This user is already assigned to another account."));
+                    }
+                    // Proceed with the update if no id_user is assigned
+                    db.run(
+                        `UPDATE user_room_data SET user_room_name = ?, id_user = ? WHERE user_spotify_name = ? AND id_room = ?`, 
+                        [user_room_name, id_user, user_spotify_name, id_room],
+                        callback
+                    );
+                }
             );
         }
     );
