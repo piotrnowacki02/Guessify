@@ -154,9 +154,22 @@ function getRoomUsersNames(roomId, callback) {
 }
 
 function updateUserRoomName(user_room_name, id_user, user_spotify_name, id_room, callback) {
-    db.run(`UPDATE user_room_data SET user_room_name = ?, id_user = ?  WHERE user_spotify_name = ? AND id_room = ?`, 
-        [user_room_name, id_user, user_spotify_name, id_room],
-        callback
+    // First, reset id_user and user_room_name to null for existing records with the same id_user in the room
+    db.run(
+        `UPDATE user_room_data SET id_user = NULL, user_room_name = NULL WHERE id_user = ? AND id_room = ?`, 
+        [id_user, id_room],
+        function (err) {
+            if (err) {
+                return callback(err);
+            }
+
+            // Then, update the record with the new user_room_name and id_user
+            db.run(
+                `UPDATE user_room_data SET user_room_name = ?, id_user = ? WHERE user_spotify_name = ? AND id_room = ?`, 
+                [user_room_name, id_user, user_spotify_name, id_room],
+                callback
+            );
+        }
     );
 }
 
