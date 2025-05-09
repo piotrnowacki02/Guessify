@@ -101,6 +101,24 @@ router.post("/create-room", (req, res) => {
     });
 });
 
+router.post("/join-room", (req, res) => {
+    const id_user = req.user.id;
+    const { id_room } = req.body;
+
+    if (!id_room) {
+        return res.status(400).json({ error: "Brak id_pokoju" });
+    }
+
+    db.getRoom(id_room, (err, room) => {
+        if (err) {
+            console.error("Błąd podczas sprawdzania pokoju:", err.message);
+            return res.status(404).json({ error: "Pokój nie istnieje" });
+        }
+
+        res.status(200).json({ message: "Dołączono do pokoju", room });
+    });
+});
+
 router.post("/get-room-players", (req, res) => {
     const id_room = req.body.id_room;
     if (!id_room) {

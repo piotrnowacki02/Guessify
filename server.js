@@ -40,7 +40,7 @@ io.on("connection", (socket) => {
                 return;
             }
     
-            io.to(room).emit("roomUsers", users); // Wysyłamy do wszystkich!
+            io.to(room).emit("roomUsers", users);
         });
     
         console.log(`🛋️(${socket.id}) dołączył do pokoju: ${room}`);

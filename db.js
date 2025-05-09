@@ -67,6 +67,18 @@ const addUser = (email, hashedPassword, callback) => {
     );
 };
 
+const getRoom = (id_room, callback) => {
+    db.get(`SELECT * FROM rooms WHERE id = ?`, [id_room], (err, row) => {
+        if (err) {
+            return callback(err);
+        }
+        if (!row) {
+            return callback(new Error("Room not found"));
+        }
+        callback(null, row);
+    });
+};
+
 const addRoom = (id_owner, id_playlist, callback) => {
     db.run(
         `INSERT INTO rooms (id_owner, id_playlist) VALUES (?, ?)`, 
@@ -199,6 +211,7 @@ function updateUserRoomName(user_room_name, id_user, user_spotify_name, id_room,
         }
     );
 }
+
 
 const getAllData = (callback) => {
     db.all(`
