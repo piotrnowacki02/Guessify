@@ -254,5 +254,6 @@ module.exports = {
     isPlaylistInDB,
     getRoomUsersNames,
     getRoomUsersSpotifyNames,
-    updateUserRoomName
+    updateUserRoomName,
+    getRoom,
 };
