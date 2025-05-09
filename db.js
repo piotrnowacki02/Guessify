@@ -167,13 +167,28 @@ function getRoomUsersSpotifyNames(roomId, callback) {
 
 function getRoomUsersNames(roomId, callback) {
     db.all(
-        `SELECT user_room_name FROM user_room_data WHERE id_room = ? AND user_room_name IS NOT NULL`,
+        `
+        SELECT 
+            urd.id_user, 
+            urd.user_room_name, 
+            CASE 
+                WHEN urd.id_user = r.id_owner THEN 1 
+                ELSE 0 
+            END AS is_admin
+        FROM user_room_data urd
+        JOIN rooms r ON urd.id_room = r.id
+        WHERE urd.id_room = ? AND urd.user_room_name IS NOT NULL
+        `,
         [roomId],
         (err, rows) => {
             if (err) {
                 return callback(err);
             }
-            const names = rows.map(row => row.user_room_name);
+            const names = rows.map(row => ({
+                id_user: row.id_user,
+                user_room_name: row.user_room_name,
+                is_admin: row.is_admin === 1 
+            }));
             callback(null, names);
         }
     );
