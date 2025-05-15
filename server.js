@@ -47,6 +47,12 @@ io.on("connection", (socket) => {
     });
 
     socket.on("admin-game-start", (room) => {
+        db.startGame(room, (err) => {
+            if (err) {
+                console.error("Błąd podczas uruchamiania gry:", err);
+                return;
+            }
+        });
         io.to(room).emit("game_start");
         console.log(`🛋️(${socket.id}) rozpoczął grę w pokoju: ${room}`);
     });

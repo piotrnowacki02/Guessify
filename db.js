@@ -227,6 +227,19 @@ function updateUserRoomName(user_room_name, id_user, user_spotify_name, id_room,
     );
 }
 
+function startGame(id_room, callback) {
+    db.run(
+        `UPDATE rooms SET status = 'playing' WHERE id = ?`, 
+        [id_room],
+        function (err) {
+            if (err) {
+                return callback(err);
+            }
+            // Proceed with the game start logic
+            callback(null);
+        }
+    );
+}
 
 const getAllData = (callback) => {
     db.all(`
@@ -256,4 +269,5 @@ module.exports = {
     getRoomUsersSpotifyNames,
     updateUserRoomName,
     getRoom,
+    startGame,
 };
