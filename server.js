@@ -47,7 +47,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("admin-game-start", (room) => {
-        socket.to(room).emit("game_start");
+        io.to(room).emit("game_start");
         console.log(`🛋️(${socket.id}) rozpoczął grę w pokoju: ${room}`);
     });
 });
