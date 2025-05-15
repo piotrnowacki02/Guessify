@@ -45,6 +45,11 @@ io.on("connection", (socket) => {
     
         console.log(`🛋️(${socket.id}) dołączył do pokoju: ${room}`);
     });
+
+    socket.on("admin-game-start", (room) => {
+        socket.to(room).emit("game_start");
+        console.log(`🛋️(${socket.id}) rozpoczął grę w pokoju: ${room}`);
+    });
 });
 
 
