@@ -79,6 +79,18 @@ const getRoom = (id_room, callback) => {
     });
 };
 
+const getRoomStatus = (id_room, callback) => {
+    db.get(`SELECT status FROM rooms WHERE id = ?`, [id_room], (err, row) => {
+        if (err) {
+            return callback(err);
+        }
+        if (!row) {
+            return callback(new Error("Room not found"));
+        }
+        callback(null, row.status);
+    });
+}
+
 const addRoom = (id_owner, id_playlist, callback) => {
     db.run(
         `INSERT INTO rooms (id_owner, id_playlist) VALUES (?, ?)`, 
@@ -270,4 +282,5 @@ module.exports = {
     updateUserRoomName,
     getRoom,
     startGame,
+    getRoomStatus,
 };

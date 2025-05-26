@@ -114,8 +114,19 @@ router.post("/join-room", (req, res) => {
             console.error("Błąd podczas sprawdzania pokoju:", err.message);
             return res.status(404).json({ error: "Pokój nie istnieje" });
         }
+        db.getRoomStatus(roomId, (err, status) => {
+            if (err) {
+                console.error("Błąd podczas sprawdzania statusu pokoju:", err.message);
+                return res.status(500).json({ error: "Nie udało się sprawdzić statusu pokoju." });
+            }
+            if (status === "playing") {
+                return res.status(400).json({ error: "Pokój jest już w trakcie gry." });
+            }
 
-        res.status(200).json({ message: "Dołączono do pokoju", room });
+            res.status(200).json({ message: "Dołączono do pokoju", room });
+        });
+
+
     });
 });
 
