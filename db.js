@@ -242,7 +242,7 @@ function updateUserRoomName(user_room_name, id_user, user_spotify_name, id_room,
 
 function startGame(id_room, callback) {
     db.run(
-        `UPDATE rooms SET status = 'playing' WHERE id = ?`, 
+        `UPDATE rooms SET status = 'playing' and round = 1 WHERE id = ?`, 
         [id_room],
         function (err) {
             if (err) {
