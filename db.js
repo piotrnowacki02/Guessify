@@ -1,5 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 
+const { get } = require('http');
 const { promisify } = require('util');
 
 const db = new sqlite3.Database('./users.db');
@@ -268,6 +269,36 @@ const getAllData = (callback) => {
     `, [], callback);
 };
 
+const getRoundInfo = (id_room, callback) => {
+    db.get(
+        `SELECT id_owner, round FROM rooms WHERE id = ?`,
+        [id_room],
+        (err, roomRow) => {
+            if (err) return callback(err);
+            if (!roomRow) return callback(new Error("Room not found"));
+
+            db.all(
+                `SELECT user_room_name, points FROM user_room_data WHERE id_room = ? AND user_room_name IS NOT NULL`,
+                [id_room],
+                (err, userRows) => {
+                    if (err) return callback(err);
+
+                    const users = {};
+                    userRows.forEach(row => {
+                        users[row.user_room_name] = row.points;
+                    });
+
+                    callback(null, {
+                        id_owner: roomRow.id_owner,
+                        round: roomRow.round,
+                        users
+                    });
+                }
+            );
+        }
+    );
+};
+
 
 module.exports = { 
     findUserByEmail,
@@ -283,4 +314,5 @@ module.exports = {
     getRoom,
     startGame,
     getRoomStatus,
+    getRoundInfo,
 };

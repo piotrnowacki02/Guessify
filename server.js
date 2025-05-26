@@ -56,6 +56,16 @@ io.on("connection", (socket) => {
         io.to(room).emit("game_start");
         console.log(`🛋️(${socket.id}) rozpoczął grę w pokoju: ${room}`);
     });
+
+    socket.on("round-info", (room) => {
+        db.getRoundInfo(room, (err, roomData) => {
+            if (err) {
+                console.error("Błąd pobierania danych pokoju:", err);
+                return;
+            }
+            io.to(room).emit("round-info-answer", roomData);
+        });
+    });
 });
 
 
