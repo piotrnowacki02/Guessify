@@ -55,6 +55,20 @@ db.run(`
     )
 `);
 
+db.run(`
+    CREATE TABLE IF NOT EXISTS guesses (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id_room INTEGER NOT NULL,
+        id_guesser INTEGER DEFAULT NULL,
+        answer TEXT DEFAULT NULL,
+        round INTEGER NOT NULL,
+        FOREIGN KEY (id_room) REFERENCES rooms(id),
+        FOREIGN KEY (id_guesser) REFERENCES users(id),
+        FOREIGN KEY (id_room, round) REFERENCES songs(id_playlist, round),
+        FOREIGN KEY (answer) REFERENCES songs(added_by)
+    )
+`);
+
 // Funkcja sprawdzająca, czy użytkownik istnieje
 const findUserByEmail = (email, callback) => {
     db.get(`SELECT * FROM users WHERE email = ?`, [email], callback);
@@ -240,6 +254,37 @@ function updateUserRoomName(user_room_name, id_user, user_spotify_name, id_room,
     );
 }
 
+// Funkcja inicjalizująca rekordy w guesses dla wszystkich graczy i wszystkich rund w danym pokoju
+function initializeGuessesForRoom(id_room, callback) {
+    // Pobierz wszystkich użytkowników z user_room_data dla danego pokoju
+    db.all(`SELECT id_user FROM user_room_data WHERE id_room = ? AND id_user IS NOT NULL`, [id_room], (err, users) => {
+        if (err) return callback(err);
+        if (!users || users.length === 0) return callback(null); // Brak graczy
+
+        // Pobierz id_playlist dla pokoju
+        db.get(`SELECT id_playlist FROM rooms WHERE id = ?`, [id_room], (err, room) => {
+            if (err) return callback(err);
+            if (!room) return callback(new Error("Room not found"));
+            const id_playlist = room.id_playlist;
+
+            // Pobierz liczbę rund (piosenek) dla tej playlisty
+            db.all(`SELECT round FROM songs WHERE id_playlist = ?`, [id_playlist], (err, rounds) => {
+                if (err) return callback(err);
+                if (!rounds || rounds.length === 0) return callback(null); // Brak rund
+
+                // Przygotuj statement do inserta
+                const stmt = db.prepare(`INSERT INTO guesses (id_room, id_guesser, answer, round) VALUES (?, ?, '', ?)`);
+                for (const user of users) {
+                    for (const roundObj of rounds) {
+                        stmt.run([id_room, user.id_user, roundObj.round]);
+                    }
+                }
+                stmt.finalize(callback);
+            });
+        });
+    });
+}
+
 function startGame(id_room, callback) {
     db.run(
         `UPDATE rooms SET status = 'playing', round = 1 WHERE id = ?`, 
@@ -248,7 +293,13 @@ function startGame(id_room, callback) {
             if (err) {
                 return callback(err);
             }
-            callback(null);
+            // Po zmianie statusu, zainicjuj guesses
+            initializeGuessesForRoom(id_room, (err) => {
+                if (err) {
+                    return callback(err);
+                }
+                callback(null);
+            });
         }
     );
 }
@@ -298,6 +349,20 @@ const getRoundInfo = (id_room, callback) => {
     );
 };
 
+// Aktualizuje odpowiedź gracza w tabeli guesses dla danej rundy
+function setUserGuess(roomId, userId, selectedUser, callback) {
+    db.getRoom(roomId, (err, room) => {
+        if (err || !room) {
+            return callback(err || new Error("Pokój nie istnieje"));
+        }
+        const round = room.round;
+        db.run(
+            `UPDATE guesses SET answer = ? WHERE id_room = ? AND id_guesser = ? AND round = ?`,
+            [selectedUser, roomId, userId, round],
+            callback
+        );
+    });
+}
 
 module.exports = { 
     findUserByEmail,
@@ -314,4 +379,5 @@ module.exports = {
     startGame,
     getRoomStatus,
     getRoundInfo,
+    setUserGuess,
 };

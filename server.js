@@ -66,6 +66,14 @@ io.on("connection", (socket) => {
             io.to(room).emit("round-info-answer", roomData);
         });
     });
+
+    socket.on("select-choice", ({ roomId, selectedUser, userId }) => {
+        db.setUserGuess(roomId, userId, selectedUser, (err) => {
+            if (err) {
+                console.error("Błąd aktualizacji odpowiedzi w guesses:", err);
+            }
+        });
+    });
 });
 
 
