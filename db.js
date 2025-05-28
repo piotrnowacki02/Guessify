@@ -365,6 +365,41 @@ function setUserGuess(roomId, userId, selectedUser, callback) {
     });
 }
 
+function checkAnswers(roomId, callback) {
+    db.get(`SELECT id_playlist, round FROM rooms WHERE id = ?`, [roomId], (err, room) => {
+        if (err || !room) {
+            return callback(err || new Error("Room not found"));
+        }
+        const id_playlist = room.id_playlist;
+        const round = room.round;
+
+        db.all(
+            `SELECT g.id_guesser, g.answer, urd.user_spotify_name,
+                    (SELECT s.added_by FROM songs s WHERE s.id_playlist = ? AND s.round = ?) AS correct_spotify_name
+             FROM guesses g 
+             JOIN user_room_data urd ON g.answer = urd.user_room_name AND urd.id_room = g.id_room
+             WHERE g.id_room = ? AND g.round = ?`,
+            [id_playlist, round, roomId, round],
+            (err, guesses) => {
+                if (err) return callback(err);
+
+                const stmt = db.prepare(`UPDATE user_room_data SET points = points + 1 WHERE id_user = ? AND id_room = ?`);
+                guesses.forEach(guess => {
+                    // guess.user_spotify_name to osoba, na którą strzelał gracz
+                    // correct_spotify_name to faktyczny właściciel piosenki w tej rundzie
+                    if (guess.user_spotify_name && guess.user_spotify_name === guess.correct_spotify_name) {
+                        stmt.run([guess.id_guesser, roomId]);
+                    }
+                });
+                stmt.finalize((err) => {
+                    if (err) return callback(err);
+                    callback(null, guesses);
+                });
+            }
+        );
+    });
+}
+
 module.exports = { 
     findUserByEmail,
     addUser,
@@ -381,4 +416,5 @@ module.exports = {
     getRoomStatus,
     getRoundInfo,
     setUserGuess,
+    checkAnswers,
 };

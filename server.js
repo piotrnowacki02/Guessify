@@ -74,6 +74,17 @@ io.on("connection", (socket) => {
             }
         });
     });
+
+    socket.on("check-answers", (roomId) => {
+        db.checkAnswers(roomId, (err, result) => {
+            if (err) {
+                console.error("Błąd podczas sprawdzania odpowiedzi:", err);
+                return;
+            }
+            io.to(roomId).emit("next-round", result);
+        });
+    });
+
 });
 
 
