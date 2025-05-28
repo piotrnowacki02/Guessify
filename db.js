@@ -351,7 +351,8 @@ const getRoundInfo = (id_room, callback) => {
 
 // Aktualizuje odpowiedź gracza w tabeli guesses dla danej rundy
 function setUserGuess(roomId, userId, selectedUser, callback) {
-    db.getRoom(roomId, (err, room) => {
+    // Użyj bezpośrednio db.get, bo db.getRoom nie jest dostępne w tym kontekście
+    db.get(`SELECT * FROM rooms WHERE id = ?`, [roomId], (err, room) => {
         if (err || !room) {
             return callback(err || new Error("Pokój nie istnieje"));
         }
