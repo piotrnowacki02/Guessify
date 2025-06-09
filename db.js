@@ -328,7 +328,7 @@ const getRoundInfo = (id_room, callback) => {
             if (!roomRow) return callback(new Error("Room not found"));
 
             db.all(
-                `SELECT coalesce(user_room_name, user_spotify_name), points FROM user_room_data WHERE id_room = ?`,
+                `SELECT coalesce(user_room_name, user_spotify_name) as user_room_name, points FROM user_room_data WHERE id_room = ?`,
                 [id_room],
                 (err, userRows) => {
                     if (err) return callback(err);
