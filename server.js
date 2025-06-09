@@ -81,7 +81,13 @@ io.on("connection", (socket) => {
                 console.error("Błąd podczas sprawdzania odpowiedzi:", err);
                 return;
             }
-            io.to(roomId).emit("next-round", result);
+            db.nextRound(roomId, (err) => {
+                if (err) {
+                    console.error("Błąd podczas zwiększania rundy:", err);
+                    return;
+                }
+                io.to(roomId).emit("next-round", result);
+            });
         });
     });
 

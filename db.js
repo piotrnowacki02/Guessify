@@ -400,6 +400,15 @@ function checkAnswers(roomId, callback) {
     });
 }
 
+// Funkcja do przejścia do następnej rundy w pokoju
+function nextRound(roomId, callback) {
+    db.run(
+        `UPDATE rooms SET round = round + 1 WHERE id = ?`,
+        [roomId],
+        callback
+    );
+}
+
 module.exports = { 
     findUserByEmail,
     addUser,
@@ -417,4 +426,5 @@ module.exports = {
     getRoundInfo,
     setUserGuess,
     checkAnswers,
+    nextRound,
 };
