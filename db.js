@@ -328,7 +328,7 @@ const getRoundInfo = (id_room, callback) => {
             if (!roomRow) return callback(new Error("Room not found"));
 
             db.all(
-                `SELECT user_room_name, points FROM user_room_data WHERE id_room = ? AND user_room_name IS NOT NULL`,
+                `SELECT coalesce(user_room_name, user_spotify_name), points FROM user_room_data WHERE id_room = ?`,
                 [id_room],
                 (err, userRows) => {
                     if (err) return callback(err);
@@ -377,7 +377,7 @@ function checkAnswers(roomId, callback) {
             `SELECT g.id_guesser, g.answer, urd.user_spotify_name,
                     (SELECT s.added_by FROM songs s WHERE s.id_playlist = ? AND s.round = ?) AS correct_spotify_name
              FROM guesses g 
-             JOIN user_room_data urd ON g.answer = urd.user_room_name AND urd.id_room = g.id_room
+             JOIN user_room_data urd ON g.answer = coalesce(urd.user_room_name, urd.user_spotify_name) AND urd.id_room = g.id_room
              WHERE g.id_room = ? AND g.round = ?`,
             [id_playlist, round, roomId, round],
             (err, guesses) => {
