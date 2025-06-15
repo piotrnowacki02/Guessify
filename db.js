@@ -286,20 +286,33 @@ function initializeGuessesForRoom(id_room, callback) {
 }
 
 function startGame(id_room, callback) {
-    db.run(
-        `UPDATE rooms SET status = 'playing', round = 1 WHERE id = ?`, 
+    db.get(
+        `SELECT status FROM rooms WHERE id = ?`,
         [id_room],
-        function (err) {
+        (err, row) => {
             if (err) {
                 return callback(err);
             }
-            // Po zmianie statusu, zainicjuj guesses
-            initializeGuessesForRoom(id_room, (err) => {
-                if (err) {
-                    return callback(err);
+            if (row && row.status === 'playing') {
+                return callback(null);
+            }
+
+            // Jeśli status nie jest 'playing', zaktualizuj go i zainicjuj guesses
+            db.run(
+                `UPDATE rooms SET status = 'playing', round = 1 WHERE id = ?`, 
+                [id_room],
+                function (err) {
+                    if (err) {
+                        return callback(err);
+                    }
+                    initializeGuessesForRoom(id_room, (err) => {
+                        if (err) {
+                            return callback(err);
+                        }
+                        callback(null);
+                    });
                 }
-                callback(null);
-            });
+            );
         }
     );
 }
